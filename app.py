@@ -23,7 +23,7 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.subheader("Test Measurements")
-    # Updated value and expanded format to 7 decimal places to accommodate 0.0012345
+    # Updated value and expanded format to 7 decimal places
     measured_r = st.number_input("Measured Resistance (Ω)", min_value=0.0000000, value=0.0012345, step=0.0000100, format="%.7f")
     
     # Updated temperature constraints, default value, and step
@@ -31,8 +31,8 @@ with col1:
 
 with col2:
     st.subheader("Design Specs")
-    # Updated to 7 decimal places to match the measurement precision
-    nominal_r = st.number_input("Nominal R20 (Ω)", min_value=0.0000000, value=15.0000000, step=0.0000100, format="%.7f")
+    # Updated default nominal resistance
+    nominal_r = st.number_input("Nominal R20 (Ω)", min_value=0.0000000, value=0.0012356, step=0.0000100, format="%.7f")
     tolerance = st.number_input("Tolerance Limit (±%)", min_value=0.0, value=3.5, step=0.1)
 
 # --- Calculation & Output Section ---
