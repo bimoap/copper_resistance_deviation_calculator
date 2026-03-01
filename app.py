@@ -1,7 +1,7 @@
 import streamlit as st
 
 def calculate_copper_r20(measured_r, measured_temp, nominal_r):
-    """Calculates R20 and deviation for standard copper."""
+    """Calculates R20 and deviation for standard copper (constant = 234.5)."""
     copper_constant = 234.5
     r_20 = measured_r * ((copper_constant + 20.0) / (copper_constant + measured_temp))
     
@@ -23,15 +23,16 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.subheader("Test Measurements")
-    # Updated to 5 decimal places
-    measured_r = st.number_input("Measured Resistance (Ω)", min_value=0.00000, value=15.50000, step=0.00100, format="%.5f")
-    measured_temp = st.number_input("Coil Temperature (°C)", min_value=-50.0, max_value=200.0, value=25.0, step=0.5)
+    # Updated value and expanded format to 7 decimal places to accommodate 0.0012345
+    measured_r = st.number_input("Measured Resistance (Ω)", min_value=0.0000000, value=0.0012345, step=0.0000100, format="%.7f")
+    
+    # Updated temperature constraints, default value, and step
+    measured_temp = st.number_input("Coil Temperature (°C)", min_value=0.0, max_value=100.0, value=20.0, step=0.1)
 
 with col2:
     st.subheader("Design Specs")
-    # Updated to 5 decimal places
-    nominal_r = st.number_input("Nominal R20 (Ω)", min_value=0.00000, value=15.00000, step=0.00100, format="%.5f")
-    # Updated default value to 3.5
+    # Updated to 7 decimal places to match the measurement precision
+    nominal_r = st.number_input("Nominal R20 (Ω)", min_value=0.0000000, value=15.0000000, step=0.0000100, format="%.7f")
     tolerance = st.number_input("Tolerance Limit (±%)", min_value=0.0, value=3.5, step=0.1)
 
 # --- Calculation & Output Section ---
@@ -44,8 +45,8 @@ if st.button("Calculate R20", type="primary"):
     # Display results using Streamlit metrics
     res_col, dev_col = st.columns(2)
     
-    # Updated output to 5 decimal places
-    res_col.metric(label="Calculated R20", value=f"{r20:.5f} Ω")
+    # Output adjusted to 7 decimal places for the resistance
+    res_col.metric(label="Calculated R20", value=f"{r20:.7f} Ω")
     
     # Configure delta display (red if out of tolerance, green if close to 0)
     if abs(deviation) <= tolerance:
