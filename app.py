@@ -24,11 +24,13 @@ conductor_type = st.selectbox(
     ("Hollow or strip copper conductor", "Copper wire conductor")
 )
 
-# Set the default tolerance based on the selection
+# Set the default lower and upper tolerances based on the selection
 if conductor_type == "Hollow or strip copper conductor":
-    default_tol = 3.5
+    default_lower = -3.5
+    default_upper = 3.5
 else:
-    default_tol = 4.0
+    default_lower = -3.0
+    default_upper = 3.5
 
 st.divider()
 
@@ -43,8 +45,10 @@ with col1:
 with col2:
     st.subheader("Design Specs")
     nominal_r = st.number_input("Nominal R20 (Ω)", min_value=0.0000000, value=0.0012356, step=0.0000100, format="%.7f")
-    # Tolerance now dynamically updates its default based on the dropdown above
-    tolerance = st.number_input("Tolerance Limit (±%)", min_value=0.0, value=default_tol, step=0.1)
+    
+    # Split tolerance into lower and upper limits to handle asymmetrical ranges
+    lower_tolerance = st.number_input("Lower Limit (%)", value=default_lower, step=0.1)
+    upper_tolerance = st.number_input("Upper Limit (%)", value=default_upper, step=0.1)
 
 # --- Calculation & Output Section ---
 if st.button("Calculate R20", type="primary"):
@@ -58,13 +62,13 @@ if st.button("Calculate R20", type="primary"):
     
     res_col.metric(label="Calculated R20", value=f"{r20:.7f} Ω")
     
-    # Configure delta display (red if out of tolerance, green if close to 0)
-    if abs(deviation) <= tolerance:
+    # Configure delta display and check against the specific lower and upper limits
+    if lower_tolerance <= deviation <= upper_tolerance:
         dev_col.metric(label="Deviation", value=f"{deviation:.5f} %", delta="Pass", delta_color="normal")
-        st.success(f"✅ **PASS**: The coil deviation ({deviation:.5f}%) is within the ±{tolerance}% limit for a {conductor_type.lower()}.")
+        st.success(f"✅ **PASS**: The coil deviation ({deviation:.5f}%) is within the {lower_tolerance}% to +{upper_tolerance}% limit for a {conductor_type.lower()}.")
     else:
         dev_col.metric(label="Deviation", value=f"{deviation:.5f} %", delta="Fail", delta_color="inverse")
-        st.error(f"❌ **FAIL**: The coil deviation ({deviation:.5f}%) exceeds the ±{tolerance}% limit for a {conductor_type.lower()}.")
+        st.error(f"❌ **FAIL**: The coil deviation ({deviation:.5f}%) is outside the {lower_tolerance}% to +{upper_tolerance}% limit for a {conductor_type.lower()}.")
 
 # --- Signature Section ---
 st.markdown("---")
