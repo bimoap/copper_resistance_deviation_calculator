@@ -1,0 +1,2 @@
+# copper_resistance_deviation_calculator
+copper_resistance_deviation_calculator
