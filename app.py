@@ -1,7 +1,7 @@
 import streamlit as st
 
 def calculate_copper_r20(measured_r, measured_temp, nominal_r):
-    """Calculates R20 and deviation for standard copper (constant = 234.5)."""
+    """Calculates R20 and deviation for standard copper."""
     copper_constant = 234.5
     r_20 = measured_r * ((copper_constant + 20.0) / (copper_constant + measured_temp))
     
@@ -23,13 +23,16 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.subheader("Test Measurements")
-    measured_r = st.number_input("Measured Resistance (Ω)", min_value=0.000, value=15.500, step=0.010, format="%.3f")
+    # Updated to 5 decimal places
+    measured_r = st.number_input("Measured Resistance (Ω)", min_value=0.00000, value=15.50000, step=0.00100, format="%.5f")
     measured_temp = st.number_input("Coil Temperature (°C)", min_value=-50.0, max_value=200.0, value=25.0, step=0.5)
 
 with col2:
     st.subheader("Design Specs")
-    nominal_r = st.number_input("Nominal R20 (Ω)", min_value=0.000, value=15.000, step=0.010, format="%.3f")
-    tolerance = st.number_input("Tolerance Limit (±%)", min_value=0.0, value=5.0, step=0.5)
+    # Updated to 5 decimal places
+    nominal_r = st.number_input("Nominal R20 (Ω)", min_value=0.00000, value=15.00000, step=0.00100, format="%.5f")
+    # Updated default value to 3.5
+    tolerance = st.number_input("Tolerance Limit (±%)", min_value=0.0, value=3.5, step=0.1)
 
 # --- Calculation & Output Section ---
 if st.button("Calculate R20", type="primary"):
@@ -41,15 +44,16 @@ if st.button("Calculate R20", type="primary"):
     # Display results using Streamlit metrics
     res_col, dev_col = st.columns(2)
     
-    res_col.metric(label="Calculated R20", value=f"{r20:.4f} Ω")
+    # Updated output to 5 decimal places
+    res_col.metric(label="Calculated R20", value=f"{r20:.5f} Ω")
     
     # Configure delta display (red if out of tolerance, green if close to 0)
     if abs(deviation) <= tolerance:
-        dev_col.metric(label="Deviation", value=f"{deviation:.2f} %", delta="Pass", delta_color="normal")
-        st.success(f"✅ **PASS**: The coil deviation ({deviation:.2f}%) is within the ±{tolerance}% limit.")
+        dev_col.metric(label="Deviation", value=f"{deviation:.5f} %", delta="Pass", delta_color="normal")
+        st.success(f"✅ **PASS**: The coil deviation ({deviation:.5f}%) is within the ±{tolerance}% limit.")
     else:
-        dev_col.metric(label="Deviation", value=f"{deviation:.2f} %", delta="Fail", delta_color="inverse")
-        st.error(f"❌ **FAIL**: The coil deviation ({deviation:.2f}%) exceeds the ±{tolerance}% limit.")
+        dev_col.metric(label="Deviation", value=f"{deviation:.5f} %", delta="Fail", delta_color="inverse")
+        st.error(f"❌ **FAIL**: The coil deviation ({deviation:.5f}%) exceeds the ±{tolerance}% limit.")
 
 # --- Signature Section ---
 st.markdown("---")
