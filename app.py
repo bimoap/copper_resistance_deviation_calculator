@@ -16,24 +16,35 @@ def calculate_copper_r20(measured_r, measured_temp, nominal_r):
 st.set_page_config(page_title="Coil QA Calculator", layout="centered")
 
 st.title("Copper Coil R20 Calculator")
-st.markdown("Calculate temperature-corrected resistance and tolerance deviations for copper winding wire.")
+st.markdown("Calculate temperature-corrected resistance and tolerance deviations for copper conductors.")
+
+# --- Conductor Selection ---
+conductor_type = st.selectbox(
+    "Select Conductor Type",
+    ("Hollow or strip copper conductor", "Copper wire conductor")
+)
+
+# Set the default tolerance based on the selection
+if conductor_type == "Hollow or strip copper conductor":
+    default_tol = 3.5
+else:
+    default_tol = 4.0
+
+st.divider()
 
 # --- Input Section ---
 col1, col2 = st.columns(2)
 
 with col1:
     st.subheader("Test Measurements")
-    # Updated value and expanded format to 7 decimal places
     measured_r = st.number_input("Measured Resistance (Ω)", min_value=0.0000000, value=0.0012345, step=0.0000100, format="%.7f")
-    
-    # Updated temperature constraints, default value, and step
     measured_temp = st.number_input("Coil Temperature (°C)", min_value=0.0, max_value=100.0, value=20.0, step=0.1)
 
 with col2:
     st.subheader("Design Specs")
-    # Updated default nominal resistance
     nominal_r = st.number_input("Nominal R20 (Ω)", min_value=0.0000000, value=0.0012356, step=0.0000100, format="%.7f")
-    tolerance = st.number_input("Tolerance Limit (±%)", min_value=0.0, value=3.5, step=0.1)
+    # Tolerance now dynamically updates its default based on the dropdown above
+    tolerance = st.number_input("Tolerance Limit (±%)", min_value=0.0, value=default_tol, step=0.1)
 
 # --- Calculation & Output Section ---
 if st.button("Calculate R20", type="primary"):
@@ -45,16 +56,15 @@ if st.button("Calculate R20", type="primary"):
     # Display results using Streamlit metrics
     res_col, dev_col = st.columns(2)
     
-    # Output adjusted to 7 decimal places for the resistance
     res_col.metric(label="Calculated R20", value=f"{r20:.7f} Ω")
     
     # Configure delta display (red if out of tolerance, green if close to 0)
     if abs(deviation) <= tolerance:
         dev_col.metric(label="Deviation", value=f"{deviation:.5f} %", delta="Pass", delta_color="normal")
-        st.success(f"✅ **PASS**: The coil deviation ({deviation:.5f}%) is within the ±{tolerance}% limit.")
+        st.success(f"✅ **PASS**: The coil deviation ({deviation:.5f}%) is within the ±{tolerance}% limit for a {conductor_type.lower()}.")
     else:
         dev_col.metric(label="Deviation", value=f"{deviation:.5f} %", delta="Fail", delta_color="inverse")
-        st.error(f"❌ **FAIL**: The coil deviation ({deviation:.5f}%) exceeds the ±{tolerance}% limit.")
+        st.error(f"❌ **FAIL**: The coil deviation ({deviation:.5f}%) exceeds the ±{tolerance}% limit for a {conductor_type.lower()}.")
 
 # --- Signature Section ---
 st.markdown("---")
