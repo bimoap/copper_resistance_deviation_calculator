@@ -21,16 +21,23 @@ st.markdown("Calculate temperature-corrected resistance and tolerance deviations
 # --- Conductor Selection ---
 conductor_type = st.selectbox(
     "Select Conductor Type",
-    ("Hollow or strip copper conductor", "Copper wire conductor")
+    (
+        "Strip/foil conductor", 
+        "Wire conductor", 
+        "Hollow Conductor"
+    )
 )
 
 # Set the default lower and upper tolerances based on the selection
-if conductor_type == "Hollow or strip copper conductor":
-    default_lower = -3.5
-    default_upper = 3.5
-else:
-    default_lower = -3.0
-    default_upper = 3.5
+if conductor_type == "Strip/foil conductor":
+    default_lower = -6.0
+    default_upper = 6.0
+elif conductor_type == "Wire conductor":
+    default_lower = -2.3
+    default_upper = 5.4
+else:  # Hollow Conductor
+    default_lower = -7.8
+    default_upper = 3.4
 
 st.divider()
 
